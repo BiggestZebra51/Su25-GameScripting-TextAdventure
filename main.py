@@ -1,6 +1,20 @@
 import Room
 from Player import *
 from Interactables import *
+
+####################################################################################################
+# Text Adventure by Jacob Crawford                                                                 #
+# In this text adventure you are diving into a dungeron to save the world from a demon lord        #
+# Once getting to the boss room you realize the demon lord has been replaced by an unknown entity  #
+# You must save the world by defeating this unknown entity in a strange battle                     #
+#                                                                                                  #
+# The comments after this box are the initial plans for this project                               #
+# Other code is in Interactables.py, Player.py, and Room.py                                        #
+####################################################################################################
+
+
+
+
 # Text adventure
 # Minimum 10 prompts
 # Decided on Python
