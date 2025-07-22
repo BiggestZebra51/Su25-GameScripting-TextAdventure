@@ -64,8 +64,93 @@ from Interactables import *
 # Initialize Rooms
 # room_id -> room
 rooms:dict[str,Room.Room] = {
-    "starting_room": Room.Room("Welcome adventurer!\nIn the room you spot a STONE and a PAPER\nYou also notice a door to your LEFT", [Item("stone"),Item("paper"),], {"left": "end_room"}),
-    "end_room": Room.Room("Upon entering the room you notice there is no where to go than BACK", [], {"back": "starting_room"})
+    "starting_room": Room.Room(
+        [
+            "You notice a door in FRONT of you",
+            Room.ActionStr("You also spot %s by the door", ["stone", "paper"], " and ", "a ")
+        ],
+        [Item("stone"),Note("Warning\nDanger beyond this point!\nThis area has been declared as a Dungeon\nTurn back for your safety")],
+        {"front": "first_junction","forward": "first_junction"}),
+    "first_junction": Room.Room(
+        [
+            "You notice three doors to your LEFT, RIGHT, and BACK",
+            Room.ActionStr("You also see a %s near the LEFT door.", ["skeleton"]),
+            Room.ActionStr("There are a couple %ss around the room.", ["rock"]),
+        ], 
+        [Enemy("skeleton"),Item("rock", 3)],
+        {
+            "back":"starting_room",
+            "left":"left_wing_upper",
+            "right":"right_wing_one"}),
+    "left_wing_upper": Room.Room(["This room seems fairly empty", "You can go BACK through a passage to the RIGHT"], [], 
+                                 {"back":"first_junction", "right":"first_junction"}),
+    "right_wing_one": Room.Room(
+        [
+            Room.ActionStr("There is a pack of %s in the middle of the room", ["goblins"]),
+            "You notice exits in FRONT of you and to your LEFT",
+            Room.ActionStr("There is %s strewn about the room", ["paper", "trash"], " and ", "some "),
+        ], [Enemy("goblins", 8, 128), Item("paper", 4), Item("trash", 6)], 
+        {   "front":"right_wing_two","forward":"right_wing_two",
+            "left":"first_junction"}),
+    "right_wing_two": Room.Room(
+        [
+            Room.ActionStr("There is a large %s in the corner", ["slime"]),
+            "There is a metal door to your left and a passage to your BACK",
+            Room.ActionStr("There are also a couple %ss on the ground", ["rock"]),
+        ], [Enemy("slime", 2, 128), Item("rock", 3)], {"back":"right_wing_one",
+                                         "left":"descend_upper"}),
+    "descend_upper": Room.Room(
+        [
+        "There is a metal door to your right and a ladder DOWN",
+        Room.ActionStr("There are also a piece of %s by the ladder", ["paper"]),
+        ], [Note("""I'm running out of food
+There is a large slime stopping me from going back where I came from
+But my instincts are screaming at me to not go further in
+I don't know how much time I have left""", 4)], {"right":"right_wing_two",
+                                        "down":"descend_lower"}),
+    "descend_lower": Room.Room(
+        [
+            "The air down here feels thick",
+            "The doorway in FRONT of you looks unstable",
+            "You get the feeling you will not be able to go back if you go FORWARD",
+            Room.ActionStr("There is an empty %s on the ground", ["bottle"]),
+        ], [Item("bottle")], {"up":"descend_upper",
+                "front":"lower_corner","forward":"lower_corner"}),
+    "lower_corner": Room.Room(
+        [
+            "There is a collapsed doorway behind you",
+            "There is no going back",
+            Room.ActionStr("You see a pack of %s", ["orks"])
+        ], [Enemy("orks", max_damage=6, max_exp=256)], {#"back":"descend_lower",
+                                       "left":"lower_junction"}),
+    "lower_junction": Room.Room(
+        [
+            "To the RIGHT and LEFT there are some passageways",
+            "To your FRONT there is a large imposing door\nYou feel a tingling on your back",
+        ], [], {"right":"lower_corner",
+                                         "left":"left_wing_lower",
+                                         "front":"boss_room"}),
+    "left_wing_lower": Room.Room(
+        [
+            Room.ActionStr("There is.. a %s in the middle of the room?", ["bed"]),
+            "You can go BACK to the RIGHT"
+        ], [Enemy("bed", 0, 1024, "You woke up and got out of the %s\nYou feel your body has adjusted to the atmosphere down here\nYou can't seem to find the bed anymore", "You decided to rest in the %s")],
+        {"back":"lower_junction","right":"lower_junction"}),
+    "boss_room": Room.BossRoom(
+        ["""Upon entering the room your skin crawls
+This- this doesn't make sense, this is not the demon lord- you don't know what this is
+You LOOK and see
+----------------------
+???? - 99999/99999 HP - LV ???
+----------------------
+You're frozen in fear
+You try to go BACK but you can't move
+
+You try to steel yourself, not just humanity, the world it's self is doomed if you die here
+feeling returns to your hands
+
+You think you can manage to use your SWORD but you aren't sure what that could even accomplish""",
+Room.ActionStr("You also have %s", ["rock", "paper"], " and ")], [])
 }
 
 
@@ -74,13 +159,20 @@ player = Player.Player("starting_room")
 # Add the sword
 player.inventory.add_item(Item("sword"))
 
+#### TESTING
+player.current_room = "boss_room"
+player.inventory.add_item(Item("paper", 4))
+player.inventory.add_item(Item("rock", 4))
+#### TESTING
+
+print("Welcome adventurer!\nYou are on an important mission to save the world\nAt the bottom of this dungeon you must fight an epic battle against the demon lord\nThe world rests upon your back\n\nUpon entering the dungeon,")
 running = True
-while running:
+while running and not player.game_over:
     # Enter current room and describe it
     room = rooms[player.current_room]
-    print(room.describe())
+    print(room.describe(player))
 
-    while True:
+    while not player.game_over:
         # Wait for user input
         user_action = str.lower(input("> "))
         # Check if the action is global
@@ -102,7 +194,7 @@ Global actions:
             print("-------------------------")
             print(player.inventory.display_inventory())
         elif(user_action == "look"):
-            print(room.describe())
+            print(room.describe(player))
             if(len(room.room_actions()) > 0):
                 print("-------------------------\nActions:")
                 print(" ".join(room.room_actions()))
