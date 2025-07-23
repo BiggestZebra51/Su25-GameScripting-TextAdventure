@@ -109,7 +109,7 @@ rooms:dict[str,Room.Room] = {
     "right_wing_two": Room.Room(
         [
             Room.ActionStr("There is a large %s in the corner", ["slime"]),
-            "There is a metal door to your left and a passage to your BACK",
+            "There is a metal door to your LEFT and a passage to your BACK",
             Room.ActionStr("There are also a couple %ss on the ground", ["rock"]),
         ], [Enemy("slime", 2, 128), Item("rock", 3)], {"back":"right_wing_one",
                                          "left":"descend_upper"}),
@@ -126,7 +126,8 @@ I don't know how much time I have left""", 4)], {"right":"right_wing_two",
         [
             "The air down here feels thick",
             "The doorway in FRONT of you looks unstable",
-            "You get the feeling you will not be able to go back if you go FORWARD",
+            "There is a ladder UP along the wall",
+            "You get the feeling you will not be able to return if you go FORWARD",
             Room.ActionStr("There is an empty %s on the ground", ["bottle"]),
         ], [Item("bottle")], {"up":"descend_upper",
                 "front":"lower_corner","forward":"lower_corner"}),
@@ -160,8 +161,9 @@ You LOOK and see
 You're frozen in fear
 You try to go BACK but you can't move
 
-You try to steel yourself, not just humanity, the world it's self is doomed if you die here
-feeling returns to your hands
+You try to steel yourself
+Not just humanity but the world it's self is doomed if you die here
+Feeling returns to your hands
 
 You think you can manage to use your SWORD but you aren't sure what that could even accomplish""",
 Room.ActionStr("You also have %s", ["rock", "paper"], " and ")], [])
