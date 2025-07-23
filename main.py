@@ -174,9 +174,9 @@ player = Player.Player("starting_room")
 player.inventory.add_item(Item("sword"))
 
 #### TESTING
-player.current_room = "boss_room"
-player.inventory.add_item(Item("paper", 4))
-player.inventory.add_item(Item("rock", 4))
+#player.current_room = "boss_room"
+#player.inventory.add_item(Item("paper", 4))
+#player.inventory.add_item(Item("rock", 4))
 #### TESTING
 
 print("Welcome adventurer!\nYou are on an important mission to save the world\nAt the bottom of this dungeon you must fight an epic battle against the demon lord\nThe world rests upon your back\n\nUpon entering the dungeon,")
